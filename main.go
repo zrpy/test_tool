@@ -158,7 +158,6 @@ func main() {
 	var totalToSend int64 = int64(*requests)
 	var useDuration bool = *duration > 0
 	var sent int64
-	var stopped atomic.Int32
 
 	producerDone := make(chan struct{})
 	go func() {
