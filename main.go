@@ -21,6 +21,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+	"math/rand"
 )
 
 type Result struct {
@@ -28,6 +29,17 @@ type Result struct {
 	err    error
 	lat    time.Duration
 }
+
+
+var (
+	userAgents   = []string{
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+		"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+		"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/125.0",
+		"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+	}
+)
 
 func splitRespectQuotes(s string) []string {
 	var res []string
@@ -142,6 +154,9 @@ func main() {
 			key := strings.TrimSpace(kv[0])
 			val := strings.TrimSpace(kv[1])
 			val = strings.Trim(val, `"`)
+			if val == "random" {
+				val = userAgents[rand.Intn(len(userAgents))]
+			}
 			headers[key] = val
 		}
 	}
