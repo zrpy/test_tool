@@ -7,6 +7,7 @@
 package main
 
 import (
+	//"bufio"
 	"bytes"
 	"context"
 	"crypto/tls"
@@ -158,11 +159,14 @@ func main() {
 	var totalToSend int64 = int64(*requests)
 	var useDuration bool = *duration > 0
 	var sent int64
+	//var stopped atomic.Int32
 
 	producerDone := make(chan struct{})
 	go func() {
 		defer close(producerDone)
 		startTime := time.Now()
+		var ticker *time.Ticker
+		var tickC <-chan time.Time
 		if *qps > 0 {
 			interval := time.Second / time.Duration(*qps)
 			if interval <= 0 {
@@ -170,6 +174,8 @@ func main() {
 			}
 			t := time.NewTicker(interval)
 			defer t.Stop()
+			ticker = t
+			tickC = t.C
 		}
 		for {
 			// Termination checks
