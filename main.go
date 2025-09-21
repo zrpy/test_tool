@@ -105,19 +105,21 @@ func main() {
 	// Parse headers
 	headers := map[string]string{}
 	if *headersFlag != "" {
-		// ; や , ではなく、1つずつ Key=Value 形式で書く
-		parts := strings.Split(*headersFlag, ",")
+		parts := splitRespectQuotes(*headersFlag)
 		for _, p := range parts {
 			p = strings.TrimSpace(p)
 			if p == "" {
 				continue
 			}
-			kv := strings.SplitN(p, "=", 2) // = で分割
+			kv := strings.SplitN(p, "=", 2)
 			if len(kv) != 2 {
 				fmt.Fprintf(os.Stderr, "invalid header: %q\n", p)
 				os.Exit(1)
 			}
-			headers[strings.TrimSpace(kv[0])] = strings.TrimSpace(kv[1])
+			key := strings.TrimSpace(kv[0])
+			val := strings.TrimSpace(kv[1])
+			val = strings.Trim(val, `"`)
+			headers[key] = val
 		}
 	}
 
