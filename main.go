@@ -105,13 +105,14 @@ func main() {
 	// Parse headers
 	headers := map[string]string{}
 	if *headersFlag != "" {
-		parts := strings.Split(*headersFlag, "; ")
+		// ; や , ではなく、1つずつ Key=Value 形式で書く
+		parts := strings.Split(*headersFlag, ",")
 		for _, p := range parts {
 			p = strings.TrimSpace(p)
 			if p == "" {
 				continue
 			}
-			kv := strings.SplitN(p, ":", 2)
+			kv := strings.SplitN(p, "=", 2) // = で分割
 			if len(kv) != 2 {
 				fmt.Fprintf(os.Stderr, "invalid header: %q\n", p)
 				os.Exit(1)
