@@ -7,7 +7,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"crypto/tls"
@@ -165,8 +164,6 @@ func main() {
 	go func() {
 		defer close(producerDone)
 		startTime := time.Now()
-		var ticker *time.Ticker
-		var tickC <-chan time.Time
 		if *qps > 0 {
 			interval := time.Second / time.Duration(*qps)
 			if interval <= 0 {
@@ -174,8 +171,6 @@ func main() {
 			}
 			t := time.NewTicker(interval)
 			defer t.Stop()
-			ticker = t
-			tickC = t.C
 		}
 		for {
 			// Termination checks
