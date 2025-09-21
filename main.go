@@ -29,6 +29,29 @@ type Result struct {
 	lat    time.Duration
 }
 
+func splitRespectQuotes(s string) []string {
+	var res []string
+	var sb strings.Builder
+	inQuotes := false
+
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if c == '"' {
+			inQuotes = !inQuotes
+			sb.WriteByte(c)
+		} else if c == ',' && !inQuotes {
+			res = append(res, sb.String())
+			sb.Reset()
+		} else {
+			sb.WriteByte(c)
+		}
+	}
+	if sb.Len() > 0 {
+		res = append(res, sb.String())
+	}
+	return res
+}
+
 func worker(ctx context.Context, id int, client *http.Client, jobs <-chan *http.Request, results chan<- Result, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for {
