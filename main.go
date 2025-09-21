@@ -105,7 +105,7 @@ func main() {
 	// Parse headers
 	headers := map[string]string{}
 	if *headersFlag != "" {
-		parts := strings.Split(*headersFlag, ",")
+		parts := strings.Split(*headersFlag, "; ")
 		for _, p := range parts {
 			p = strings.TrimSpace(p)
 			if p == "" {
