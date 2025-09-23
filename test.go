@@ -228,9 +228,6 @@ func main() {
 			defer wg.Done()
 			// per-goroutine rand to avoid contention
 			rng := mathrand.New(mathrand.NewSource(time.Now().UnixNano() + int64(id*7919)))
-			poolBuf := &sync.Pool{
-				New: func() interface{} { return make([]byte, 0, 4096) },
-			}
 			for {
 				select {
 				case <-ctx.Done():
@@ -406,7 +403,6 @@ func main() {
 		}
 		fmt.Println("====================================")
 	}
-
 	// Best-effort cleanup
-	_ = tr.CloseIdleConnections()
+	tr.CloseIdleConnections()
 }
