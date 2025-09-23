@@ -50,6 +50,29 @@ type result struct {
 	lat    time.Duration
 }
 
+func splitRespectQuotes(s string) []string {
+	var res []string
+	var sb strings.Builder
+	inQuotes := false
+
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if c == '"' {
+			inQuotes = !inQuotes
+			sb.WriteByte(c)
+		} else if c == ',' && !inQuotes {
+			res = append(res, sb.String())
+			sb.Reset()
+		} else {
+			sb.WriteByte(c)
+		}
+	}
+	if sb.Len() > 0 {
+		res = append(res, sb.String())
+	}
+	return res
+}
+
 func fileReadOrNil(path string) ([]byte, error) {
 	if path == "" {
 		return nil, nil
@@ -116,23 +139,23 @@ func main() {
 	}
 
 	// Parse headers
-	headers := make(map[string]string)
+	headers := map[string]string{}
 	if *headersFlag != "" {
-		// accept newline or semicolon separated
-		parts := strings.FieldsFunc(*headersFlag, func(r rune) bool {
-			return r == '\n' || r == ';'
-		})
+		parts := splitRespectQuotes(*headersFlag)
 		for _, p := range parts {
 			p = strings.TrimSpace(p)
 			if p == "" {
 				continue
 			}
-			kv := strings.SplitN(p, ":", 2)
+			kv := strings.SplitN(p, "=", 2)
 			if len(kv) != 2 {
 				fmt.Fprintf(os.Stderr, "invalid header: %q\n", p)
 				os.Exit(1)
 			}
-			headers[strings.TrimSpace(kv[0])] = strings.TrimSpace(kv[1])
+			key := strings.TrimSpace(kv[0])
+			val := strings.TrimSpace(kv[1])
+			val = strings.Trim(val, `"`)
+			headers[key] = val
 		}
 	}
 
